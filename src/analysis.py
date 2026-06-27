@@ -57,7 +57,9 @@ for term in search_terms:
     print(results)
 
     results["Search Term"] = term
-results_list.append(results)
+
+    # THIS MUST BE INSIDE THE LOOP
+    results_list.append(results)
 
 # Save correlation table
 save_correlation_table(results_list)

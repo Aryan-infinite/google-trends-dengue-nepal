@@ -1,0 +1,4 @@
+Search Term,Pearson r,Pearson p,Spearman rho,Spearman p,Interpretation
+Dengue fever,0.784,<0.001,0.765,<0.001,Strong positive
+Fever,0.618,<0.001,0.482,<0.001,Strong positive
+Dengue Symptoms,0.695,<0.001,0.73,<0.001,Strong positive
