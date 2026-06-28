@@ -1,7 +1,7 @@
 from tables import save_correlation_table
 from plotting import scatter_plot
 from stats_analysis import correlation
-import pandas as pd
+import pandas as p
 
 print("="*50)
 print("Google Trends × Dengue Nepal")
