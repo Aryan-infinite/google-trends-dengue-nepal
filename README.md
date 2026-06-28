@@ -47,13 +47,16 @@ Variables:
 
 ## Statistical Analysis
 
-Performed using Python.
+The analytical workflow was implemented entirely in Python to ensure reproducibility.
 
-Methods:
+The following statistical methods were used:
 
-- Pearson Correlation
-- Spearman Rank Correlation
-- Scatter Plots with Linear Regression
+* Pearson correlation coefficient
+* Spearman rank correlation coefficient
+* Publication-quality scatter plots with fitted linear regression lines
+
+All analyses are reproducible using the scripts provided in the `src/` directory.
+ ALso, In Microsoft Excel, time lag correlation was also done.
 
 ---
 
