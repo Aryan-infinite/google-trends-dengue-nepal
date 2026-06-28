@@ -15,9 +15,13 @@ Using monthly Google Trends data and official EDCD dengue case reports, we perfo
 
 ## Research Questions
 
-- Can Google Trends predict dengue outbreaks?
-- Which search terms best correlate with dengue incidence?
-- Can publicly available search data support digital disease surveillance?
+This study aims to answer the following questions:
+
+* Is Google Trends search interest significantly correlated with laboratory-confirmed dengue cases in Nepal?
+* Which dengue-related search term demonstrates the strongest association with reported dengue incidence?
+* Can publicly available search engine data complement traditional disease surveillance systems for earlier outbreak detection?
+* What is the potential role of digital epidemiology in strengthening infectious disease surveillance in low-resource settings such as Nepal?
+
 
 ---
 
