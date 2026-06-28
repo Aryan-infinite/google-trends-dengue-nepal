@@ -1,0 +1,22 @@
+Search Term,Lag,Pearson r,p-value
+Dengue fever,-3,-0.0604,0.621933
+Dengue fever,-2,0.0926,0.445892
+Dengue fever,-1,0.4495,8.4e-05
+Dengue fever,0,0.7841,0.0
+Dengue fever,1,0.4872,1.6e-05
+Dengue fever,2,0.0987,0.416411
+Dengue fever,3,-0.0824,0.500813
+Fever,-3,-0.1792,0.140777
+Fever,-2,-0.0729,0.548937
+Fever,-1,0.2623,0.027115
+Fever,0,0.6181,0.0
+Fever,1,0.5562,0.0
+Fever,2,0.2674,0.025211
+Fever,3,-0.0038,0.975497
+Dengue Symptoms,-3,-0.0605,0.62141
+Dengue Symptoms,-2,0.0673,0.579663
+Dengue Symptoms,-1,0.3773,0.001179
+Dengue Symptoms,0,0.6949,0.0
+Dengue Symptoms,1,0.4745,2.9e-05
+Dengue Symptoms,2,0.1079,0.374053
+Dengue Symptoms,3,-0.0744,0.543252

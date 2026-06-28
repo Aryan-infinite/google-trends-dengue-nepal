@@ -2,6 +2,9 @@ from tables import save_correlation_table
 from plotting import scatter_plot
 from stats_analysis import correlation
 import pandas as pd
+from time_lag import lag_correlation
+from lag_plot import lag_plot
+from heatmap import correlation_heatmap
 
 print("="*50)
 print("Google Trends × Dengue Nepal")
@@ -70,3 +73,38 @@ for term in search_terms:
     scatter_plot(data, term)
 
 print("Done.")
+print("\nGenerating time-lag analysis...")
+
+lag_results = []
+
+for term in search_terms:
+    df = lag_correlation(
+        data,
+        term,
+        max_lag=3
+    )
+    lag_results.append(df)
+
+lag_results = pd.concat(
+    lag_results,
+    ignore_index=True
+)
+
+lag_results.to_csv(
+    "results/tables/Table_2_Time_Lag_Correlation.csv",
+    index=False
+)
+
+for term in search_terms:
+    lag_plot(
+        lag_results,
+        term
+    )
+
+print("✓ Time-lag analysis completed.")
+
+print("\nCreating correlation heatmap...")
+
+correlation_heatmap(data)
+
+print("✓ Analysis complete.")
