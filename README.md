@@ -1,76 +1,83 @@
+# Dengue Fever in Nepal: A Correlation Between Google Trends and National Surveillance Reports
 
-# Google Trends–Based Dengue Surveillance in Nepal
-
-A reproducible Python-based research pipeline investigating the relationship between Google Trends search interest and laboratory-confirmed dengue cases in Nepal (2019–2024).
-
----
-
-## Overview
-
-This study explores whether Google Trends search activity can serve as an early indicator of dengue outbreaks in Nepal.
-
-Using monthly Google Trends data and official EDCD dengue case reports, we performed correlation analyses to evaluate the association between online search behavior and confirmed dengue incidence.
+This repository contains the complete analytical workflow used in the study **"Dengue Fever in Nepal: A Correlation Between Google Trends and National Surveillance Reports."** The project investigates the relationship between Google Trends search activity and laboratory-confirmed dengue cases reported in Nepal between **January 2019 and December 2024**. Using official surveillance data from the Epidemiology and Disease Control Division (EDCD) and publicly available Google Trends data, the study evaluates whether internet search behavior can complement traditional disease surveillance and support earlier detection of dengue outbreaks.
 
 ---
 
-## Research Questions
+## Research Objectives
 
-This study aims to answer the following questions:
+This study aimed to:
 
-* Is Google Trends search interest significantly correlated with laboratory-confirmed dengue cases in Nepal?
-* Which dengue-related search term demonstrates the strongest association with reported dengue incidence?
-* Can publicly available search engine data complement traditional disease surveillance systems for earlier outbreak detection?
-* What is the potential role of digital epidemiology in strengthening infectious disease surveillance in low-resource settings such as Nepal?
-
+- Quantify the relationship between Google Trends Relative Search Volume (RSV) and laboratory-confirmed dengue cases in Nepal.
+- Compare the performance of three dengue-related Google search terms ("Dengue fever", "Dengue Symptoms", and "Fever").
+- Evaluate whether Google search activity precedes officially reported dengue cases using time-lag correlation analysis.
+- Assess the potential of Google Trends as a complementary digital epidemiology tool for strengthening dengue surveillance in Nepal.
 
 ---
 
 ## Dataset
 
-**Period**
+### Study Period
 
-2019–2024
+January 2019 – December 2024 (72 monthly observations)
 
-**Source**
+### Data Sources
 
-- Google Trends
-- Epidemiology and Disease Control Division (EDCD), Nepal
+- **Google Trends** (https://trends.google.com/)
+- **Epidemiology and Disease Control Division (EDCD), Department of Health Services, Ministry of Health and Population, Government of Nepal**
 
-Variables:
+### Variables
 
-- Dengue fever
-- Fever
-- Dengue Symptoms
-- Confirmed Dengue Cases
+- Monthly Relative Search Volume (RSV) for:
+  - Dengue fever
+  - Dengue Symptoms
+  - Fever
+- Monthly laboratory-confirmed dengue cases reported through the national surveillance system.
 
 ---
 
 ## Statistical Analysis
 
-The analytical workflow was implemented entirely in Python to ensure reproducibility.
+The analytical workflow was designed to ensure full reproducibility.
 
-The following statistical methods were used:
+Python (Version 3.13) was used for data processing, descriptive statistics, correlation analysis, and visualization using the following libraries:
 
-* Pearson correlation coefficient
-* Spearman rank correlation coefficient
-* Publication-quality scatter plots with fitted linear regression lines
+- Pandas
+- NumPy
+- SciPy
+- Matplotlib
 
-All analyses are reproducible using the scripts provided in the `src/` directory.
- ALso, In Microsoft Excel, time lag correlation was also done.
+The analyses included:
+
+- Data preprocessing and cleaning
+- Descriptive statistics
+- Pearson correlation analysis
+- Spearman rank correlation analysis
+- Two-tailed significance testing (p-values)
+- Scatter plots with fitted linear regression lines
+- Pearson correlation heatmap
+
+Time-lag correlation analysis was performed separately in **Microsoft Excel** by shifting Google Trends Relative Search Volume (RSV) against laboratory-confirmed dengue cases across predefined monthly lead and lag intervals.
 
 ---
 
 ## Repository Structure
 
-```
+```text
 google-trends-dengue-nepal/
 
 ├── data/
+│   ├── raw/
+│   └── processed/
+│
 ├── docs/
+│
 ├── results/
 │   ├── figures/
 │   └── tables/
+│
 ├── src/
+│
 ├── README.md
 ├── requirements.txt
 └── LICENSE
@@ -78,64 +85,74 @@ google-trends-dengue-nepal/
 
 ---
 
-## Results
+## Reproducing the Analysis
 
-Outputs generated automatically:
-
-- Correlation analysis table
-- Publication-quality scatter plots
-
-Figures are available inside:
-
-```
-results/figures/
-```
-
-Tables are available inside:
-
-```
-results/tables/
-```
-
----
-
-## Installation
+Clone the repository:
 
 ```bash
 git clone <repository-url>
 
 cd google-trends-dengue-nepal
+```
 
+Install the required Python packages:
+
+```bash
 pip install -r requirements.txt
 ```
 
----
-
-## Run Analysis
+Run the complete analysis:
 
 ```bash
 python src/analysis.py
+```
+
+Running the script will reproduce the statistical analyses, tables, and publication-quality figures included in the manuscript.
+
+---
+
+## Outputs
+
+The repository generates:
+
+- Descriptive statistics
+- Pearson and Spearman correlation tables
+- Scatter plots with fitted regression lines
+- Pearson correlation heatmap
+- Publication-ready figures
+- Statistical summary tables
+
+Generated outputs are saved in:
+
+```text
+results/
+├── figures/
+└── tables/
 ```
 
 ---
 
 ## Authors
 
-Aryan Bhusal
-
+**Aryan Bhusal**  
 Independent Researcher
 
-Bishal Neupane
-
+**Bishal Neupane**  
 Independent Researcher
 
-Rita Neupane
-
+**Rita Neupane**  
 Independent Researcher
+
+---
+
+## Citation
+
+If you use this repository, please cite:
+
+> Bhusal A, Neupane B, Neupane R. *Dengue Fever in Nepal: A Correlation Between Google Trends and National Surveillance Reports.* GitHub repository.
 
 ---
 
 ## License
 
-MIT License
-=======
+This project is distributed under the **MIT License**.
