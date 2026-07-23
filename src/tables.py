@@ -1,5 +1,16 @@
 import pandas as pd
 
+
+def save_shapiro_table(results):
+
+    df = pd.DataFrame(results)
+
+    df.to_csv(
+        "results/tables/Table_0_Shapiro_Wilk.csv",
+        index=False
+    )
+
+    print("✓ Shapiro-Wilk table saved.")
 def save_correlation_table(results_list):
 
     df = pd.DataFrame(results_list)

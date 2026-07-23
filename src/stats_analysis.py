@@ -1,4 +1,5 @@
-from scipy.stats import pearsonr, spearmanr
+from scipy.stats import pearsonr, spearmanr, shapiro
+
 
 
 def correlation(x, y):
@@ -15,4 +16,20 @@ def correlation(x, y):
         "Pearson p": float(pearson_p),
         "Spearman rho": float(round(spearman_r, 4)),
         "Spearman p": float(spearman_p)
+    }
+
+
+def shapiro_test(series):
+
+    statistic, p_value = shapiro(series.dropna())
+
+    if p_value < 0.001:
+        p_display = "<0.001"
+    else:
+        p_display = round(p_value, 4)
+
+    return {
+        "W Statistic": round(statistic, 4),
+        "p-value": p_display,
+        "Normal": "Yes" if p_value > 0.05 else "No"
     }

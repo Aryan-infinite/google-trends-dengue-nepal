@@ -1,6 +1,6 @@
-from tables import save_correlation_table
+from tables import save_correlation_table, save_shapiro_table
 from plotting import scatter_plot
-from stats_analysis import correlation
+from stats_analysis import correlation, shapiro_test
 import pandas as pd
 from time_lag import lag_correlation
 from lag_plot import lag_plot
@@ -25,7 +25,28 @@ print(data.describe())
 
 print("\nMissing Values")
 print(data.isnull().sum())
+print("\nGenerating Shapiro-Wilk normality table...")
 
+variables = [
+    "Dengue fever",
+    "Fever",
+    "Dengue Symptoms",
+    "Confirmed Cases"
+]
+
+shapiro_results = []
+
+for variable in variables:
+
+    result = shapiro_test(data[variable])
+
+    result["Variable"] = variable
+
+    shapiro_results.append(result)
+
+save_shapiro_table(shapiro_results)
+
+print("✓ Shapiro-Wilk analysis completed.")
 results = correlation(
     data["Dengue fever"],
     data["Confirmed Cases"]
