@@ -1,0 +1,8 @@
+# Versions used to produce the submitted figures (23 November 2026)
+# Python 3.13.18
+numpy==2.5.3
+pandas==3.0.5
+matplotlib==3.11.2
+pillow==12.3.0
+openpyxl==3.1.5
+# R 4.3.3 with readxl 1.4.3

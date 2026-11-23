@@ -1,0 +1,3 @@
+fb74cfd73431b4f953db27a34acd1721c28aeefbb238552d208ec48c170a8c97  data_raw/gt_dengue_term.csv
+3e52eef24685614f598daaa4d2ea171514d19f143dd28d2645ad7a734553d939  data_raw/gt_dengue_term_day2_2026-11-22.csv
+4d6e2ea95aa8049264aacc0cd6fe7438ea7bc0903c05b5d1e6b598c595b14896  data_raw/gt_dengue_term_day3_2026-11-23.csv
