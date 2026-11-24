@@ -1,0 +1,9 @@
+{
+  "name": "dengue-nepal-revision-2026",
+  "private": true,
+  "description": "JavaScript checks and the Word table builder for the revised analysis",
+  "dependencies": {
+    "docx": "9.8.1",
+    "jszip": "3.10.1"
+  }
+}
