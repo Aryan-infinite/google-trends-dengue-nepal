@@ -1,8 +1,13 @@
-# Versions used to produce the submitted figures (23 November 2026)
+# Versions used to produce the submitted figures and tables (24 November 2026)
 # Python 3.13.18
 numpy==2.5.3
 pandas==3.0.5
 matplotlib==3.11.2
 pillow==12.3.0
 openpyxl==3.1.5
-# R 4.3.3 with readxl 1.4.3
+scipy==1.18.1
+statsmodels==0.15.0
+python-docx==1.2.0
+# R 4.3.3 with readxl 1.4.3, sandwich 3.1.0 and MASS 7.3-60.0.1
+# Node.js 22 with the packages in package.json (npm install)
+# Tesseract OCR 5.3.4 and ImageMagick 6.9.12 (command-line tools)
