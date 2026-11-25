@@ -1,4 +1,4 @@
-# Image-level check of the DELIVERED Figure S2 TIFF, second implementation (R; ImageMagick decode; base R).
+# Image-level check of the DELIVERED Figure S3 TIFF, second implementation (R; ImageMagick decode; base R).
 # Different estimators from scripts/59: in each region's row band, the CI ends are the outermost black columns and the dot
 # is the middle of the columns where the black ink is tallest; markers in panel (b) by bounding-box centre of the ink in
 # each row band. Expected values recomputed in R from the raw district workbook (own zone grouping as in scripts/58).
@@ -6,8 +6,8 @@ suppressMessages(library(readxl))
 fails <- 0
 check <- function(l, ok, d = "") { cat(sprintf("[%s] %s%s\n", if (isTRUE(ok)) "PASS" else "FAIL", l, if (nzchar(d)) paste0("  (", d, ")") else "")); if (!isTRUE(ok)) fails <<- fails + 1 }
 runs <- function(i) { if (!length(i)) return(matrix(numeric(0), ncol = 2)); b <- which(diff(i) > 1); cbind(c(i[1], i[b + 1]), c(i[b], i[length(i)])) }
-src <- readLines("scripts/58_check_figureS2.R"); eval(parse(text = src[grep("^ZONE <- list", src):grep("^print\\(format\\(Rv", src) - 1]))
-ppm <- tempfile(fileext = ".ppm"); stopifnot(system2("convert", c("manuscript/figures/FigS2.tif", "-colorspace", "sRGB", "-depth", "8", ppm)) == 0)
+src <- readLines("scripts/58_check_figureS3.R"); eval(parse(text = src[grep("^ZONE <- list", src):grep("^print\\(format\\(Rv", src) - 1]))
+ppm <- tempfile(fileext = ".ppm"); stopifnot(system2("convert", c("manuscript/figures/FigS3.tif", "-colorspace", "sRGB", "-depth", "8", ppm)) == 0)
 con <- file(ppm, "rb"); hd <- character(0)
 while (length(hd) < 4) { ch <- character(0); repeat { z <- rawToChar(readBin(con, "raw", 1)); if (z %in% c(" ", "\n")) break; ch <- c(ch, z) }; if (length(ch)) hd <- c(hd, paste(ch, collapse = "")) }
 w <- as.integer(hd[2]); h <- as.integer(hd[3]); v <- readBin(con, "raw", w * h * 3); close(con); unlink(ppm)

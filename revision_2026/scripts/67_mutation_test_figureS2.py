@@ -1,8 +1,15 @@
-"""Mutation tests for every Figure S3 check (runs in a temporary copy; the project is not modified).
-Level 1: falsified value / drawn files must fail scripts/63_check_figureS3.R (three-program check).
-Level 2: falsified FigS3.tif images must fail the image checks they target: 65 (Py digitiser), 66 (R digitiser),
-34 (OCR, S3 lines), 47 / 48 (residual ink, S3 lines)."""
+"""Mutation tests for every Figure S2 check (runs in a temporary copy; the project is not modified).
+Level 1: falsified value / drawn files must fail scripts/63_check_figureS2.R (three-program check).
+Level 2: falsified FigS2.tif images must fail the image checks they target: 65 (Py digitiser), 66 (R digitiser),
+34 (OCR, FS2 lines), 47 / 48 (residual ink, FigS2 lines)."""
 import os, shutil, subprocess, tempfile
+
+def _guarded_run(*a, **k):
+    """A check killed by the system (e.g. out of memory) prints nothing; stop instead of counting it as caught or missed."""
+    r = subprocess.run(*a, **k)
+    if r.returncode < 0 or r.returncode == 137:
+        raise SystemExit(f'ABORTED: a check was killed (exit {r.returncode}): {a[0] if a else k.get("args")}; rerun with nothing else running')
+    return r
 import numpy as np, pandas as pd
 from PIL import Image, ImageDraw
 Image.MAX_IMAGE_PIXELS = None
@@ -13,40 +20,40 @@ NODE_MODULES = os.path.join(SRC, 'node_modules') if os.path.isdir(os.path.join(S
 for f in sorted(os.listdir(os.path.join(SRC, 'manuscript/figures'))):        # every figure built (the OCR and residual-ink checks read all)
     if f.endswith('.tif'): shutil.copy(os.path.join(SRC, 'manuscript/figures', f), os.path.join(T, 'manuscript/figures', f))
 for f in ('06_2024_reporting_lag.csv', '23_announcement_timing.json', '24_announcement_timing.json'): shutil.copy(os.path.join(SRC, 'out', f), os.path.join(T, 'out'))
-run = lambda c, env=None: subprocess.run(c, cwd=T, capture_output=True, text=True, env={**os.environ, **(env or {})})
-assert run(['python3', '-I', 'scripts/62_figureS3.py']).returncode == 0
+run = lambda c, env=None: _guarded_run(c, cwd=T, capture_output=True, text=True, env={**os.environ, **(env or {})})
+assert run(['python3', '-I', 'scripts/62_figureS2.py']).returncode == 0
 assert run(['node', 'scripts/64_s3_independent.js'], {'NODE_PATH': NODE_MODULES}).returncode == 0
-assert run(['Rscript', 'scripts/63_check_figureS3.R']).returncode == 0, 'true files must pass first'
-O = {f: os.path.join(T, 'out', f) for f in ('figS3_values.csv', 'figS3_values_js.csv', 'figS3_plotted_values.csv', 'figS3_events_drawn.csv', 'figS3_events_js.csv', 'figS3_text.csv')}
+assert run(['Rscript', 'scripts/63_check_figureS2.R']).returncode == 0, 'true files must pass first'
+O = {f: os.path.join(T, 'out', f) for f in ('figS2_values.csv', 'figS2_values_js.csv', 'figS2_plotted_values.csv', 'figS2_events_drawn.csv', 'figS2_events_js.csv', 'figS2_text.csv')}
 for p in O.values(): shutil.copy(p, p + '.good')
-print('Level 1: files vs scripts/63_check_figureS3.R')
+print('Level 1: files vs scripts/63_check_figureS2.R')
 L1 = []
 def c1(name, f, edit):
     for p in O.values(): shutil.copy(p + '.good', p)
     d = pd.read_csv(O[f]); edit(d); d.to_csv(O[f], index=False, float_format='%.17g')
-    r = run(['Rscript', 'scripts/63_check_figureS3.R']); L1.append(r.returncode != 0)
+    r = run(['Rscript', 'scripts/63_check_figureS2.R']); L1.append(r.returncode != 0)
     print(f"  {name:50s} {'CAUGHT' if L1[-1] else 'MISSED'}")
-c1('Python search 2023-05 relative value + 1e-9', 'figS3_values.csv', lambda d: d.__setitem__('search_rel', np.where((d.year == 2023) & (d.month == 5), d.search_rel + 1e-9, d.search_rel)))
-c1('JavaScript event 2024-10-15 x + 0.01 month', 'figS3_events_js.csv', lambda d: d.__setitem__('x', np.where(d.date == '2024-10-15', d.x + 0.01, d.x)))
-c1('drawn case line 2022 Sep - 0.002', 'figS3_plotted_values.csv', lambda d: d.__setitem__('y', np.where((d.series == 'cases') & (d.year == 2022) & (d.x == 8.5), d.y - 0.002, d.y)))
-c1('2022-05-06 drawn as a national alert', 'figS3_events_drawn.csv', lambda d: (d.__setitem__('category', np.where(d.date == '2022-05-06', 'alert', d.category)), d.__setitem__('marker', np.where(d.date == '2022-05-06', 'v', d.marker))))
-c1('note "\u2264 3" printed as "< 3"', 'figS3_text.csv', lambda d: d.__setitem__('text', d.text.str.replace('\u2264 3', '< 3', regex=False)))
+c1('Python search 2023-05 relative value + 1e-9', 'figS2_values.csv', lambda d: d.__setitem__('search_rel', np.where((d.year == 2023) & (d.month == 5), d.search_rel + 1e-9, d.search_rel)))
+c1('JavaScript event 2024-10-15 x + 0.01 month', 'figS2_events_js.csv', lambda d: d.__setitem__('x', np.where(d.date == '2024-10-15', d.x + 0.01, d.x)))
+c1('drawn case line 2022 Sep - 0.002', 'figS2_plotted_values.csv', lambda d: d.__setitem__('y', np.where((d.series == 'cases') & (d.year == 2022) & (d.x == 8.5), d.y - 0.002, d.y)))
+c1('2022-05-06 drawn as a national alert', 'figS2_events_drawn.csv', lambda d: (d.__setitem__('category', np.where(d.date == '2022-05-06', 'alert', d.category)), d.__setitem__('marker', np.where(d.date == '2022-05-06', 'v', d.marker))))
+c1('note "\u2264 3" printed as "< 3"', 'figS2_text.csv', lambda d: d.__setitem__('text', d.text.str.replace('\u2264 3', '< 3', regex=False)))
 for p in O.values(): shutil.copy(p + '.good', p)
 
 print('Level 2: falsified images')
-S = os.path.join(T, 'scripts/62_figureS3.py'); ORIG = open(S).read(); TIF = os.path.join(T, 'manuscript/figures/FigS3.tif'); shutil.copy(TIF, TIF + '.good')
+S = os.path.join(T, 'scripts/62_figureS2.py'); ORIG = open(S).read(); TIF = os.path.join(T, 'manuscript/figures/FigS2.tif'); shutil.copy(TIF, TIF + '.good')
 def patch(a, b):
     def make():
-        assert a in ORIG; open(S, 'w').write(ORIG.replace(a, b)); r = run(['python3', '-I', 'scripts/62_figureS3.py']); assert r.returncode == 0, r.stderr; open(S, 'w').write(ORIG)
+        assert a in ORIG; open(S, 'w').write(ORIG.replace(a, b)); r = run(['python3', '-I', 'scripts/62_figureS2.py']); assert r.returncode == 0, r.stderr; open(S, 'w').write(ORIG)
     return make
 def dot(xy, r, fill):
     def make():
         im = Image.open(TIF); im.load(); x, y = xy; ImageDraw.Draw(im).ellipse([x - r, y - r, x + r, y + r], fill=fill); im.save(TIF, compression='tiff_lzw', dpi=(1200, 1200))
     return make
-CH = {'Py65': ['python3', '-I', 'scripts/65_digitise_figureS3.py'], 'R66': ['Rscript', 'scripts/66_digitise_figureS3.R'],
+CH = {'Py65': ['python3', '-I', 'scripts/65_digitise_figureS2.py'], 'R66': ['Rscript', 'scripts/66_digitise_figureS2.R'],
       'OCR': ['python3', '-I', 'scripts/34_ocr_figures.py'], 'Py47': ['python3', '-I', 'scripts/47_residual_ink.py'], 'R48': ['Rscript', 'scripts/48_residual_ink.R']}
-def failed(k, r): return any(l.startswith('[FAIL]') and (k not in ('OCR', 'Py47', 'R48') or 'S3' in l) for l in r.stdout.splitlines())
-V0 = "V = pd.DataFrame(V); V.to_csv('out/figS3_values.csv', index=False, float_format='%.17g')"
+def failed(k, r): return any(l.startswith('[FAIL]') and (k not in ('OCR', 'Py47', 'R48') or 'FigS2' in l or 'FS2' in l) for l in r.stdout.splitlines())
+V0 = "V = pd.DataFrame(V); V.to_csv('out/figS2_values.csv', index=False, float_format='%.17g')"
 E0 = "assert len(ev) == 15, len(ev)"
 M = [('2023 August cases drawn 0.03 too low', patch(V0, V0 + "; V.loc[(V.year == 2023) & (V.month == 8), 'cases_rel'] -= 0.03"), ['Py65', 'R66']),
      ('2023-05-10 alert drawn one week late', patch(E0, E0 + "; ev = [(('2023-05-17' if d == '2023-05-10' else d), c) for d, c in ev]"), ['Py65', 'R66']),

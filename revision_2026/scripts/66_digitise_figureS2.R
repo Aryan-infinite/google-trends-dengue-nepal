@@ -1,4 +1,4 @@
-# Image-level check of the DELIVERED Supplementary Figure S3 TIFF, second implementation (R; ImageMagick decode; base R).
+# Image-level check of the DELIVERED Supplementary Figure S2 TIFF, second implementation (R; ImageMagick decode; base R).
 # Different estimators from scripts/65:
 #   - y scale from the bottom spine (0) and the gridline at 1; x scale from the left spine (0) and the 12 tick marks;
 #   - line values by COLUMN CENTRES: in every column of every shallow segment (|slope| < 1 px/px), away from vertices and
@@ -12,7 +12,7 @@ suppressMessages(library(readxl))
 fails <- 0
 check <- function(l, ok, d = "") { cat(sprintf("[%s] %s%s\n", if (isTRUE(ok)) "PASS" else "FAIL", l, if (nzchar(d)) paste0("  (", d, ")") else "")); if (!isTRUE(ok)) fails <<- fails + 1 }
 runs <- function(i) { if (!length(i)) return(matrix(numeric(0), ncol = 2)); b <- which(diff(i) > 1); cbind(c(i[1], i[b + 1]), c(i[b], i[length(i)])) }
-src <- readLines("scripts/63_check_figureS3.R")
+src <- readLines("scripts/63_check_figureS2.R")
 eval(parse(text = src[grep("^mk <- format", src):grep("^Rv <- data.frame", src)]))                      # cases, s, cc, crel, srel
 eval(parse(text = src[grep("^CATR <- c", src):(grep("^CATR <- c", src) + 1)]))
 L6 <- read.csv("out/06_2024_reporting_lag.csv", stringsAsFactors = FALSE)
@@ -20,7 +20,7 @@ ev <- rbind(data.frame(date = names(CATR), category = unname(CATR)), data.frame(
 dd <- as.Date(ev$date); ev$year <- as.integer(format(dd, "%Y")); mth <- as.integer(format(dd, "%m"))
 ev$x <- (mth - 1) + (as.integer(format(dd, "%d")) - 0.5) / as.integer(format(as.Date(sprintf("%d-%02d-01", ev$year + (mth == 12), mth %% 12 + 1)) - 1, "%d"))
 
-tif <- Sys.getenv("FIGS3_TIF", "manuscript/figures/FigS3.tif")
+tif <- Sys.getenv("FIGS3_TIF", "manuscript/figures/FigS2.tif")
 ppm <- tempfile(fileext = ".ppm"); stopifnot(system2("convert", c(tif, "-colorspace", "sRGB", "-depth", "8", ppm)) == 0)
 con <- file(ppm, "rb"); hd <- character(0)
 while (length(hd) < 4) { ch <- character(0); repeat { z <- rawToChar(readBin(con, "raw", 1)); if (z %in% c(" ", "\n")) break; ch <- c(ch, z) }; if (length(ch)) hd <- c(hd, paste(ch, collapse = "")) }

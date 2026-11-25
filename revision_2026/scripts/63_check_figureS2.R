@@ -1,7 +1,7 @@
-# Independent check of Supplementary Figure S3 (R) and three-program comparison.
+# Independent check of Supplementary Figure S2 (R) and three-program comparison.
 # R recomputes every plotted value and every event position from the raw files and compares:
-#   (1) R vs Python (out/figS3_values.csv) vs JavaScript (out/figS3_values_js.csv, out/figS3_events_js.csv);
-#   (2) what was drawn (out/figS3_plotted_values.csv, out/figS3_events_drawn.csv, out/figS3_text.csv);
+#   (1) R vs Python (out/figS2_values.csv) vs JavaScript (out/figS2_values_js.csv, out/figS2_events_js.csv);
+#   (2) what was drawn (out/figS2_plotted_values.csv, out/figS2_events_drawn.csv, out/figS2_text.csv);
 #   (3) the check E timing metrics logged earlier (out/23_announcement_timing.json, out/24_announcement_timing.json);
 #   (4) the delivered TIFF's mode, resolution and size (ImageMagick identify).
 # Event categories here come from a table keyed by DATE, written from the statements in the events file
@@ -22,13 +22,13 @@ cc <- cases; cc[YR == 2019 & MO <= 5] <- NA
 crel <- ave(cc, YR, FUN = function(v) v / max(v, na.rm = TRUE)); srel <- ave(s, YR, FUN = function(v) v / max(v))
 Rv <- data.frame(year = YR, month = MO, cases_rel = crel, search_rel = srel)
 
-P <- read.csv("out/figS3_values.csv"); J <- read.csv("out/figS3_values_js.csv")
+P <- read.csv("out/figS2_values.csv"); J <- read.csv("out/figS2_values_js.csv")
 ok_key <- function(d) identical(as.integer(d$year), YR) && identical(as.integer(d$month), MO)
 check("(1) R = Python, 144 relative values (1e-12; same missing months)", ok_key(P) && same(P$cases_rel, Rv$cases_rel) && same(P$search_rel, Rv$search_rel))
 check("(1) R = JavaScript, 144 relative values", ok_key(J) && same(J$cases_rel, Rv$cases_rel) && same(J$search_rel, Rv$search_rel))
 check("(1) Python raw monthly values = raw files", same(P$cases[!is.na(cc)], cc[!is.na(cc)], 0) && same(P$search, s))
 
-D <- read.csv("out/figS3_plotted_values.csv")
+D <- read.csv("out/figS2_plotted_values.csv")
 dv <- function(nm) { d <- D[D$series == nm, ]; d[order(d$year, d$x), ] }
 dc <- dv("cases"); ds <- dv("search")
 check("(2) drawn x = month centres 0.5..11.5 in every panel", nrow(dc) == 72 && nrow(ds) == 72 && same(dc$x, MO - 0.5) && same(ds$x, MO - 0.5) && identical(as.integer(dc$year), YR))
@@ -45,8 +45,8 @@ ev <- rbind(data.frame(date = names(CATR), category = unname(CATR)), data.frame(
 dd <- as.Date(ev$date); y <- as.integer(format(dd, "%Y")); m <- as.integer(format(dd, "%m")); d <- as.integer(format(dd, "%d"))
 nd <- as.integer(format(as.Date(sprintf("%d-%02d-01", y + (m == 12), m %% 12 + 1)) - 1, "%d"))
 ev$year <- y; ev$x <- (m - 1) + (d - 0.5) / nd; ev <- ev[order(ev$date), ]
-ED <- read.csv("out/figS3_events_drawn.csv", stringsAsFactors = FALSE); ED <- ED[order(ED$date), ]
-EJ <- read.csv("out/figS3_events_js.csv", stringsAsFactors = FALSE); EJ <- EJ[order(EJ$date), ]
+ED <- read.csv("out/figS2_events_drawn.csv", stringsAsFactors = FALSE); ED <- ED[order(ED$date), ]
+EJ <- read.csv("out/figS2_events_js.csv", stringsAsFactors = FALSE); EJ <- EJ[order(EJ$date), ]
 check("(2) 15 drawn events = R events (date, year, category, x)", nrow(ED) == 15 && identical(ED$date, ev$date) && identical(ED$category, ev$category) &&
       identical(as.integer(ED$year), ev$year) && same(ED$x, ev$x))
 check("(2) marker shape follows category (v alert, o count, s report)", identical(ED$marker, unname(c(alert = "v", count = "o", report = "s")[ED$category])))
@@ -61,14 +61,14 @@ j23 <- rd("out/23_announcement_timing.json"); j24 <- rd("out/24_announcement_tim
 check("(3) half-maximum and peak months from the drawn data = check E (scripts/23 and /24), 24 values",
       length(j23) == 24 && identical(mine[names(j23)], j23) && identical(j24[names(j23)], j23))
 
-T <- read.csv("out/figS3_text.csv", stringsAsFactors = FALSE, encoding = "UTF-8")
+T <- read.csv("out/figS2_text.csv", stringsAsFactors = FALSE, encoding = "UTF-8")
 want <- c(sprintf("(%s) %d", letters[1:6], 2019:2024), "Cases not recorded Jan–May", "Search index ≤ 3 all year", "Search index ≤ 2 all year",
           "No national alert found", "Cases", "Search interest", "National alert or EDCD statement", "Count announced", "Daily reports began / WHO report")
 hex <- function(v) vapply(v, function(z) paste(charToRaw(z), collapse = ""), "", USE.NAMES = FALSE)   # byte comparison: locale-proof
 check("(2) all drawn text exactly as intended (UTF-8 bytes)", nrow(T) == length(want) && setequal(hex(T$text), hex(want)))
 check("(2) notes sit on the right panels", identical(T$year[T$kind == "note"], c(2019L, 2020L, 2021L)) && identical(T$year[T$kind == "strip"], 2021L))
 
-id <- system2("identify", c("-format", shQuote("%[colorspace] %x %y %w %h %[compression]"), "manuscript/figures/FigS3.tif"), stdout = TRUE)
+id <- system2("identify", c("-format", shQuote("%[colorspace] %x %y %w %h %[compression]"), "manuscript/figures/FigS2.tif"), stdout = TRUE)
 p <- strsplit(id, " ")[[1]]
 check("(4) TIFF: CMYK, 1200 dpi, 170 x 150 mm, LZW", p[1] == "CMYK" && as.numeric(p[2]) == 1200 && as.numeric(p[3]) == 1200 &&
       abs(as.numeric(p[4]) / 1200 * 25.4 - 170) < 0.05 && abs(as.numeric(p[5]) / 1200 * 25.4 - 150) < 0.05 && p[6] == "LZW", id)

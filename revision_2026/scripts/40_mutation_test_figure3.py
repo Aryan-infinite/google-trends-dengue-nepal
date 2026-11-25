@@ -5,6 +5,13 @@ must fail at least the intended image check(s): scripts/38 (Python digitiser), 3
 Runs in a temporary copy; the project is not modified.
 """
 import os, shutil, subprocess, tempfile
+
+def _guarded_run(*a, **k):
+    """A check killed by the system (e.g. out of memory) prints nothing; stop instead of counting it as caught or missed."""
+    r = subprocess.run(*a, **k)
+    if r.returncode < 0 or r.returncode == 137:
+        raise SystemExit(f'ABORTED: a check was killed (exit {r.returncode}): {a[0] if a else k.get("args")}; rerun with nothing else running')
+    return r
 import pandas as pd
 from PIL import Image, ImageDraw
 Image.MAX_IMAGE_PIXELS = None
@@ -14,7 +21,7 @@ os.makedirs(os.path.join(T, 'out/final'), exist_ok=True); os.makedirs(os.path.jo
 for f in sorted(os.listdir(os.path.join(SRC, 'manuscript/figures'))):        # every figure built (the OCR and residual-ink checks read all)
     if f.endswith('.tif'): shutil.copy(os.path.join(SRC, 'manuscript/figures', f), os.path.join(T, 'manuscript/figures', f))
 shutil.copy(os.path.join(SRC, 'out/final/final_results.xlsx'), os.path.join(T, 'out/final/final_results.xlsx'))
-run = lambda c: subprocess.run(c, cwd=T, capture_output=True, text=True)
+run = lambda c: _guarded_run(c, cwd=T, capture_output=True, text=True)
 assert run(['python3', '-I', 'scripts/00_prepare_inputs.py']).returncode == 0
 assert run(['python3', '-I', 'scripts/35_figure3.py']).returncode == 0
 CSV = os.path.join(T, 'out/fig3_plotted_values.csv'); good = pd.read_csv(CSV, dtype={'annotation': str}); good['annotation'] = good['annotation'].fillna('')

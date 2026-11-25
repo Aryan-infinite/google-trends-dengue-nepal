@@ -1,4 +1,4 @@
-"""Supplementary Figure S2. Regional search interest and regional reported cases, 2020-2023 (Question 5; descriptive).
+"""Supplementary Figure S3. Regional search interest and regional reported cases, 2020-2023 (Question 5; descriptive).
 (a) Seasonally adjusted correlation (log scales, calendar-month means removed within 2020-2023, n = 48) with 95% CI,
     for the three regions with fewer than 30 zero months (Central, Eastern, Western).
     CI = union of the Fisher interval on the effective sample size and the 12-month block-bootstrap interval
@@ -6,7 +6,7 @@
 (b) Ratio of the 2023 seasonal peak to the 2022 seasonal peak, for cases and for search interest, per region.
 Inputs: out/edcd_devregion_monthly_2019_2023.csv (scripts/04, from the EDCD district workbook, which is not public),
         data_raw/gt_dengue_region_{central,eastern,western}.csv.
-Outputs: manuscript/figures/FigS2.tif, FigS2_preview.png; out/figS2_values.csv; out/figS2_plotted_values.csv
+Outputs: manuscript/figures/FigS3.tif, FigS3_preview.png; out/figS3_values.csv; out/figS3_plotted_values.csv
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
@@ -41,7 +41,7 @@ for r_ in REG:
     assert blo >= flo and bhi <= fhi, f'{r_}: bootstrap interval not inside Fisher interval; union differs from Fisher'
     rows.append(dict(region=r_, r=r, n_eff=ne, ci_lo=min(flo, blo), ci_hi=max(fhi, bhi), boot_lo=blo, boot_hi=bhi, zeros=int((s == 0).sum()),
                      ratio_cases=c[36:].max() / c[24:36].max(), ratio_search=s[36:].max() / s[24:36].max()))
-V = pd.DataFrame(rows); V.to_csv('out/figS2_values.csv', index=False, float_format='%.17g')
+V = pd.DataFrame(rows); V.to_csv('out/figS3_values.csv', index=False, float_format='%.17g')
 
 font = fc.setup()
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(fc.WIDTH_MM * fc.MM, 62 * fc.MM), gridspec_kw=dict(wspace=0.55, width_ratios=[1, 1.1]))
@@ -61,11 +61,11 @@ a2.legend(handles=[Line2D([], [], ls='', marker='o', color=fc.INK, ms=4.5, label
           loc='lower center', bbox_to_anchor=(0.5, 1.0), ncol=2, frameon=False, borderaxespad=0.3)
 for ax, lab in zip((a1, a2), 'ab'): ax.text(-0.3, 1.02, f'({lab})', transform=ax.transAxes, fontweight='bold', va='bottom')
 fig.subplots_adjust(left=0.115, right=0.985, top=0.86, bottom=0.2)
-preview = fc.save_tiff_cmyk(fig, 'manuscript/figures/FigS2.tif')
+preview = fc.save_tiff_cmyk(fig, 'manuscript/figures/FigS3.tif')
 pt = err.lines[0].get_data(); seg = err.lines[2][0].get_segments()
 D = pd.DataFrame({'region': REG, 'y': pt[1], 'r_drawn': pt[0], 'lo_drawn': [s_[0][0] for s_ in seg], 'hi_drawn': [s_[1][0] for s_ in seg],
                   'cases_drawn': mk.get_offsets()[:, 0], 'search_drawn': ms.get_offsets()[:, 0],
                   'ytick_a': [t.get_text() for t in a1.get_yticklabels()], 'ytick_b': [t.get_text() for t in a2.get_yticklabels()]})
 D['xlabel_a'] = a1.get_xlabel(); D['xlabel_b'] = a2.get_xlabel()
-D.to_csv('out/figS2_plotted_values.csv', index=False, float_format='%.17g')
+D.to_csv('out/figS3_plotted_values.csv', index=False, float_format='%.17g')
 print('font:', font); print(V.round(4).to_string(index=False))

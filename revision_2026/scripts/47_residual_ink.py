@@ -34,8 +34,8 @@ PAL = {'Fig1': [BLACK, INK2, GRID, (236, 234, 231), (57, 115, 185), (232, 99, 44
        'Fig3': [BLACK, INK2, GRID, (57, 115, 185)],
        'Fig4': [BLACK, INK2, GRID, (154, 153, 150), (57, 115, 185), (232, 99, 44)],
        'FigS1': [BLACK, INK2, GRID, (57, 115, 185)],
-       'FigS2': [BLACK, INK2, GRID, (57, 115, 185)],
-       'FigS3': [BLACK, INK2, GRID, (57, 115, 185)]}
+       'FigS3': [BLACK, INK2, GRID, (57, 115, 185)],
+       'FigS2': [BLACK, INK2, GRID, (57, 115, 185)]}
 
 def axes_boxes(a):
     """Plot areas from the pixels: (x_left_spine_end, y_top, x_right, y_bottom_spine) per panel."""
@@ -80,7 +80,7 @@ def dark_neutral_fringe(sub):
     return ndi.binary_dilation(neutral, iterations=3)
 
 def grid_rule(sub, frac=0.5):
-    """frac: share of the row a gridline must show (FigS3 2021: the flat search line covers most of the 0.5 gridline)."""
+    """frac: share of the row a gridline must show (FigS2 2021: the flat search line covers most of the 0.5 gridline)."""
     grid = (np.abs(sub - GRID).sum(2) <= 18) & ~dark_neutral_fringe(sub)
     rows = [r for r in runs(np.where(grid.sum(1) > frac * grid.shape[1])[0])]
     cols = [r for r in runs(np.where(grid.sum(0) > 0.5 * grid.shape[0])[0])]
@@ -89,16 +89,16 @@ def grid_rule(sub, frac=0.5):
     for u, v in cols: ok[:, max(0, u - 7):v + 8] = True
     return big(grid & ~ok)
 
-for name in ('Fig1', 'Fig2', 'Fig3', 'Fig4', 'FigS1', 'FigS2', 'FigS3'):
-    if name == 'FigS2' and not os.path.exists('manuscript/figures/FigS2.tif'):    # S2 needs the non-public EDCD district workbook
-        print('[SKIP] FigS2: not built (needs the EDCD district workbook, which is not public)'); continue
+for name in ('Fig1', 'Fig2', 'Fig3', 'Fig4', 'FigS1', 'FigS3', 'FigS2'):
+    if name == 'FigS3' and not os.path.exists('manuscript/figures/FigS3.tif'):    # S2 needs the non-public EDCD district workbook
+        print('[SKIP] FigS3: not built (needs the EDCD district workbook, which is not public)'); continue
     a = load(f'manuscript/figures/{name}.tif'); boxes = axes_boxes(a)
     extra = None
     if name == 'Fig2':                                       # translucent markers and their stacks: any saturated ink
         ch = a.max(2) - a.min(2); extra = ch > 40
     for k, box in enumerate(boxes):
         lab = 'abcdefgh'[k]
-        if name == 'FigS3':                                                  # boxes come spine by spine; name them by year
+        if name == 'FigS2':                                                  # boxes come spine by spine; name them by year
             lab = str(2019 + 2 * sorted({b[1] for b in boxes}).index(box[1]) + (0 if box[0] < a.shape[1] // 2 else 1))
         if name == 'Fig2':
             sub = a[box[1]:box[3], box[0]:box[2]]           # unknown-colour and gridline tests for Fig 2 use marker geometry: scripts 31/32
@@ -106,7 +106,7 @@ for name in ('Fig1', 'Fig2', 'Fig3', 'Fig4', 'FigS1', 'FigS2', 'FigS3'):
             bad, pure, sub = residual(name, a, box, extra)
             check(f'{name}({lab}) no ink of an unknown colour', not bad.any(),
                   f'{int(bad.sum())} px' + (f' at x {box[0] + np.where(bad)[1].min()}-{box[0] + np.where(bad)[1].max()}, y {box[1] + np.where(bad)[0].min()}-{box[1] + np.where(bad)[0].max()}' if bad.any() else ''))
-            g = grid_rule(sub, 0.15 if name == 'FigS3' else 0.5)
+            g = grid_rule(sub, 0.15 if name == 'FigS2' else 0.5)
             check(f'{name}({lab}) gridline grey only on gridlines', not g.any(), f'{int(g.sum())} px off gridlines')
         ink2 = (np.abs(sub - INK2).sum(2) <= 30) & ~black_fringe(sub); blk = np.abs(sub - BLACK).sum(2) <= 30
         H, Wd = ink2.shape
@@ -145,15 +145,15 @@ for name in ('Fig1', 'Fig2', 'Fig3', 'Fig4', 'FigS1', 'FigS2', 'FigS3'):
             tri = runs(np.where(o.sum(1) > 0.25 * Wd)[0])
             for u, v in tri: o[u - 8:v + 9, :] = False
             check(f'FigS1({lab}) dark grey only on the zero line and the two dashed bands', len(tri) == 3 and not o.any(), f'{len(tri)} bands; {int(o.sum())} px elsewhere')
-        if name == 'FigS2':                                                  # panel (b): the vertical reference line at 1 only
+        if name == 'FigS3':                                                  # panel (b): the vertical reference line at 1 only
             o = ink2.copy(); o[H - 15:, :] = False
             vl = runs(np.where(o.sum(0) > 0.8 * H)[0])
             for u, v in vl: o[:, u - 8:v + 9] = False
-            check(f'FigS2({lab}) dark grey only on the reference line (panel b)', len(vl) == (1 if lab == 'b' else 0) and not o.any(), f'{len(vl)} vertical lines; {int(o.sum())} px elsewhere')
-        if name == 'FigS3':                                                  # top strip (above 1.05 on a 0-1.25 axis) holds the event
+            check(f'FigS3({lab}) dark grey only on the reference line (panel b)', len(vl) == (1 if lab == 'b' else 0) and not o.any(), f'{len(vl)} vertical lines; {int(o.sum())} px elsewhere')
+        if name == 'FigS2':                                                  # top strip (above 1.05 on a 0-1.25 axis) holds the event
             st = int(0.17 * H); o = ink2.copy(); o[H - 15:, :] = False      # markers and the 2021 note; the lines never reach it
             o[:st, :] = False; bl = np.abs(sub - (57, 115, 185)).sum(2) <= 60
-            check(f'FigS3({lab}) dark grey only in the event strip; no line ink in the strip', not o.any() and not blk[:st].any() and not bl[:st].any(),
+            check(f'FigS2({lab}) dark grey only in the event strip; no line ink in the strip', not o.any() and not blk[:st].any() and not bl[:st].any(),
                   f'{int(o.sum())} grey px below the strip; {int(blk[:st].sum())} black, {int(bl[:st].sum())} blue px in it')
         if name == 'Fig4':
             o = ink2.copy(); o[H - 15:, :] = False

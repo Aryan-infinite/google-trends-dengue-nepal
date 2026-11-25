@@ -3,6 +3,13 @@ Level 1: falsified value / drawn / title files must fail scripts/51_check_figure
 Level 2: falsified FigS1.tif images must fail the image checks they target: 53 (Py digitiser), 54 (R digitiser),
 34 (OCR, S1 lines), 47 / 48 (residual ink, S1 lines)."""
 import os, shutil, subprocess, tempfile
+
+def _guarded_run(*a, **k):
+    """A check killed by the system (e.g. out of memory) prints nothing; stop instead of counting it as caught or missed."""
+    r = subprocess.run(*a, **k)
+    if r.returncode < 0 or r.returncode == 137:
+        raise SystemExit(f'ABORTED: a check was killed (exit {r.returncode}): {a[0] if a else k.get("args")}; rerun with nothing else running')
+    return r
 import numpy as np, pandas as pd
 from PIL import Image, ImageDraw
 Image.MAX_IMAGE_PIXELS = None
@@ -13,7 +20,7 @@ NODE_MODULES = os.path.join(SRC, 'node_modules') if os.path.isdir(os.path.join(S
 for f in sorted(os.listdir(os.path.join(SRC, 'manuscript/figures'))):        # every figure built (the OCR and residual-ink checks read all)
     if f.endswith('.tif'): shutil.copy(os.path.join(SRC, 'manuscript/figures', f), os.path.join(T, 'manuscript/figures', f))
 for f in ('21_reviewer_checks.json', '22_reviewer_checks.json'): shutil.copy(os.path.join(SRC, 'out', f), os.path.join(T, 'out'))
-run = lambda c, env=None: subprocess.run(c, cwd=T, capture_output=True, text=True, env={**os.environ, **(env or {})})
+run = lambda c, env=None: _guarded_run(c, cwd=T, capture_output=True, text=True, env={**os.environ, **(env or {})})
 assert run(['python3', '-I', 'scripts/00_prepare_inputs.py']).returncode == 0
 assert run(['python3', '-I', 'scripts/50_figureS1.py']).returncode == 0
 assert run(['node', 'scripts/52_acf_independent.js'], {'NODE_PATH': NODE_MODULES}).returncode == 0
@@ -45,7 +52,7 @@ def dot(xy, r, fill):
     return make
 CH = {'Py53': ['python3', '-I', 'scripts/53_digitise_figureS1.py'], 'R54': ['Rscript', 'scripts/54_digitise_figureS1.R'],
       'OCR': ['python3', '-I', 'scripts/34_ocr_figures.py'], 'Py47': ['python3', '-I', 'scripts/47_residual_ink.py'], 'R48': ['Rscript', 'scripts/48_residual_ink.R']}
-def failed(k, r): return any(l.startswith('[FAIL]') and (k not in ('OCR', 'Py47', 'R48') or 'S1' in l) for l in r.stdout.splitlines())
+def failed(k, r): return any(l.startswith('[FAIL]') and (k not in ('OCR', 'Py47', 'R48') or 'FigS1' in l or 'FS1' in l) for l in r.stdout.splitlines())
 blue = None
 M = [('bar acf3 (log cases) drawn 0.01 too high', patch("vals = np.array([get(key, f'{kind}{k}') for k in lags])",
           "vals = np.array([get(key, f'{kind}{k}') for k in lags]); vals = vals + (0.01 * (lags == 3) if (key, kind) == ('ly_raw', 'acf') else 0)"), ['Py53', 'R54']),

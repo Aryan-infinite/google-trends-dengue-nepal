@@ -1,4 +1,4 @@
-"""Image-level check of the DELIVERED Supplementary Figure S3 TIFF (Python; independent of the plotting code).
+"""Image-level check of the DELIVERED Supplementary Figure S2 TIFF (Python; independent of the plotting code).
 Per panel: y scale from the two gridlines (0.5, 1) and the bottom spine (0); x scale from the 12 month tick marks.
 Expected values recomputed here from the raw files; event positions from the events file with this script's own
 date arithmetic (datetime) and category rule.
@@ -14,7 +14,7 @@ from PIL import Image, ImageCms
 from scipy import ndimage as ndi
 Image.MAX_IMAGE_PIXELS = None
 ICC = os.environ.get('CMYK_ICC', '/usr/share/texlive/texmf-dist/tex/generic/colorprofiles/FOGRA39L_coated.icc')
-TIF = os.environ.get('FIGS3_TIF', 'manuscript/figures/FigS3.tif')
+TIF = os.environ.get('FIGS3_TIF', 'manuscript/figures/FigS2.tif')
 fails = []
 def check(n, ok, d=''):
     print(f"[{'PASS' if ok else 'FAIL'}] {n}" + (f'  ({d})' if d else '')); ok or fails.append(n)

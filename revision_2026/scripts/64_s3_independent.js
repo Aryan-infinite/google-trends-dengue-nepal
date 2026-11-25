@@ -1,4 +1,4 @@
-// Third, independent implementation of the Supplementary Figure S3 values (JavaScript / Node.js).
+// Third, independent implementation of the Supplementary Figure S2 values (JavaScript / Node.js).
 //   - reads the preprint .xlsx by unzipping it (jszip) and parsing the worksheet XML directly;
 //   - parses the three Google Trends CSVs by hand;
 const fs = require('fs');
@@ -49,10 +49,10 @@ function readTrends(path) {
   if (lines.length !== 72) throw new Error(`${path}: ${lines.length} rows`);
   return lines.map(l => { const v = l.split(',')[1].trim(); return v === '<1' ? 0.5 : Number(v); });
 }
-// Shares no code with scripts/62_figureS3.py or scripts/63_check_figureS3.R. Event categories are assigned here by
+// Shares no code with scripts/62_figureS2.py or scripts/63_check_figureS2.R. Event categories are assigned here by
 // keyword rules on event_type (Python uses an explicit lookup table; R uses its own table).
 // Usage: node scripts/64_s3_independent.js
-// Output: out/figS3_values_js.csv, out/figS3_events_js.csv
+// Output: out/figS2_values_js.csv, out/figS2_events_js.csv
 function parseCsv(text) {                      // RFC 4180: quoted fields, doubled quotes, commas inside quotes
   const rows = []; let row = [], f = '', q = false;
   for (let i = 0; i < text.length; i++) {
@@ -88,12 +88,12 @@ function xOf(d) {
     const cm = Math.max(...c.filter(v => !Number.isNaN(v))), sm = Math.max(...ss);
     for (let m = 0; m < 12; m++) out.push([y, m + 1, Number.isNaN(c[m]) ? 'NA' : (c[m] / cm).toPrecision(17), (ss[m] / sm).toPrecision(17)].join(','));
   }
-  fs.writeFileSync('out/figS3_values_js.csv', out.join('\n') + '\n');
+  fs.writeFileSync('out/figS2_values_js.csv', out.join('\n') + '\n');
   const ev = [];
   for (const r of parseCsv(fs.readFileSync('governance/announcement_events.csv', 'utf8'))) { const c = category(r.event_type); if (c) ev.push([r.date, c]); }
   for (const r of parseCsv(fs.readFileSync('out/06_2024_reporting_lag.csv', 'utf8'))) if (!/-12-31$/.test(r.as_of)) ev.push([r.as_of, 'count']);
   const eo = ['date,year,category,x'];
   for (const [d, c] of ev) { const [y, x] = xOf(d); eo.push([d, y, c, x.toPrecision(17)].join(',')); }
-  fs.writeFileSync('out/figS3_events_js.csv', eo.join('\n') + '\n');
+  fs.writeFileSync('out/figS2_events_js.csv', eo.join('\n') + '\n');
   console.log(`JS: ${out.length - 1} monthly rows, ${ev.length} events`);
 })();

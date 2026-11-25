@@ -4,6 +4,13 @@ Level 2: falsified Fig4.tif images, re-rendered from a patched copy of scripts/4
 must fail the image checks they target: scripts/44 (Python digitiser), 45 (R digitiser), 34 (OCR, Figure 4 lines).
 """
 import os, shutil, subprocess, tempfile
+
+def _guarded_run(*a, **k):
+    """A check killed by the system (e.g. out of memory) prints nothing; stop instead of counting it as caught or missed."""
+    r = subprocess.run(*a, **k)
+    if r.returncode < 0 or r.returncode == 137:
+        raise SystemExit(f'ABORTED: a check was killed (exit {r.returncode}): {a[0] if a else k.get("args")}; rerun with nothing else running')
+    return r
 import numpy as np, pandas as pd
 from PIL import Image, ImageDraw
 Image.MAX_IMAGE_PIXELS = None
@@ -14,7 +21,7 @@ for f in sorted(os.listdir(os.path.join(SRC, 'manuscript/figures'))):        # e
     if f.endswith('.tif'): shutil.copy(os.path.join(SRC, 'manuscript/figures', f), os.path.join(T, 'manuscript/figures', f))
 shutil.copy(os.path.join(SRC, 'out/final/final_results.xlsx'), os.path.join(T, 'out/final/'))
 shutil.copy(os.path.join(SRC, 'out/15_nowcast_monthly_refit.xlsx'), os.path.join(T, 'out/'))
-run = lambda c, env=None: subprocess.run(c, cwd=T, capture_output=True, text=True, env={**os.environ, **(env or {})})
+run = lambda c, env=None: _guarded_run(c, cwd=T, capture_output=True, text=True, env={**os.environ, **(env or {})})
 NODE_MODULES = os.path.join(SRC, 'node_modules') if os.path.isdir(os.path.join(SRC, 'node_modules')) else os.environ.get('NODE_PATH', '')  # npm install
 JS_ENV = {'NODE_PATH': NODE_MODULES}
 assert run(['python3', '-I', 'scripts/00_prepare_inputs.py']).returncode == 0

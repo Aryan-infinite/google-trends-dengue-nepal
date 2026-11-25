@@ -1,6 +1,13 @@
 """Mutation test for scripts/29_check_figure2.R: each deliberately wrong version of the Figure 2 outputs
 must make the R check fail. The real files are restored afterwards."""
 import shutil, subprocess, numpy as np, pandas as pd
+
+def _guarded_run(*a, **k):
+    """A check killed by the system (e.g. out of memory) prints nothing; stop instead of counting it as caught or missed."""
+    r = subprocess.run(*a, **k)
+    if r.returncode < 0 or r.returncode == 137:
+        raise SystemExit(f'ABORTED: a check was killed (exit {r.returncode}): {a[0] if a else k.get("args")}; rerun with nothing else running')
+    return r
 P, S = 'out/fig2_plotted_values.csv', 'out/fig2_stats.csv'
 for f in (P, S): shutil.copy(f, f + '.bak')
 gp, gs = pd.read_csv(P), pd.read_csv(S, dtype=str)
@@ -22,11 +29,11 @@ caught = 0
 try:
     for name, mutate in mutants.items():
         shutil.copy(P + '.bak', P); shutil.copy(S + '.bak', S); mutate()
-        r = subprocess.run(['Rscript', 'scripts/29_check_figure2.R'], capture_output=True, text=True)
+        r = _guarded_run(['Rscript', 'scripts/29_check_figure2.R'], capture_output=True, text=True)
         ok = r.returncode != 0; caught += ok
         print(f"{name:22s} {'CAUGHT' if ok else 'MISSED'}  {[l for l in r.stdout.splitlines() if 'FAIL' in l]}")
 finally:
     for f in (P, S): shutil.move(f + '.bak', f)
 print(f'caught {caught}/{len(mutants)}')
-r = subprocess.run(['Rscript', 'scripts/29_check_figure2.R'], capture_output=True, text=True)
+r = _guarded_run(['Rscript', 'scripts/29_check_figure2.R'], capture_output=True, text=True)
 print('restored files pass:', r.returncode == 0)

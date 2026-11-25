@@ -2,6 +2,13 @@
 Stray marks are painted into copies of the delivered TIFFs in empty parts of a panel; each must be caught by the
 Python AND the R implementation. Runs in a temporary copy; the project is not modified."""
 import os, shutil, subprocess, tempfile
+
+def _guarded_run(*a, **k):
+    """A check killed by the system (e.g. out of memory) prints nothing; stop instead of counting it as caught or missed."""
+    r = subprocess.run(*a, **k)
+    if r.returncode < 0 or r.returncode == 137:
+        raise SystemExit(f'ABORTED: a check was killed (exit {r.returncode}): {a[0] if a else k.get("args")}; rerun with nothing else running')
+    return r
 import numpy as np
 from PIL import Image, ImageDraw
 Image.MAX_IMAGE_PIXELS = None
@@ -13,7 +20,7 @@ for f in sorted(os.listdir(os.path.join(SRC, 'manuscript/figures'))):        # e
 FIG = {n: os.path.join(T, f'manuscript/figures/{n}.tif') for n in ('Fig1', 'Fig2', 'Fig3', 'Fig4')}
 def reset():
     for n, p in FIG.items(): shutil.copy(os.path.join(SRC, f'manuscript/figures/{n}.tif'), p)
-run = lambda c: subprocess.run(c, cwd=T, capture_output=True, text=True)
+run = lambda c: _guarded_run(c, cwd=T, capture_output=True, text=True)
 def sample(fig, xy):
     im = Image.open(FIG[fig]); return im.getpixel(xy)
 reset()

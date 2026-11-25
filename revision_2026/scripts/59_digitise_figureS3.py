@@ -1,4 +1,4 @@
-"""Image-level check of the DELIVERED Supplementary Figure S2 TIFF (Python; independent of the plotting code).
+"""Image-level check of the DELIVERED Supplementary Figure S3 TIFF (Python; independent of the plotting code).
 Panel (a): x scale from the gridlines at 0, 0.25, ..., 1.00; each region's dot (centroid of black blob) and CI ends
 (horizontal extent of the black CI line in that row). Panel (b): log x scale from gridlines at 0.1, 0.3, 3, 10 and the
 reference line at 1; case dots (black) and search triangles (blue) located by centroid. No black or blue ink elsewhere.
@@ -27,7 +27,7 @@ for r_ in REG:
     a, b = adj(np.log(s + .5)), adj(np.log(c + 1)); r = np.corrcoef(a, b)[0, 1]
     ne = max(48 / (1 + 2 * sum(lagr(a, k) * lagr(b, k) for k in range(1, 13))), 4); z, se = np.arctanh(r), 1 / np.sqrt(ne - 3)
     E[r_] = dict(r=r, lo=np.tanh(z - 1.96 * se), hi=np.tanh(z + 1.96 * se), rc=c[36:].max() / c[24:36].max(), rs=s[36:].max() / s[24:36].max())
-im = Image.open('manuscript/figures/FigS2.tif'); assert im.mode == 'CMYK'
+im = Image.open('manuscript/figures/FigS3.tif'); assert im.mode == 'CMYK'
 A = np.asarray(ImageCms.applyTransform(im, ImageCms.buildTransform(ICC, ImageCms.createProfile('sRGB'), 'CMYK', 'RGB'))).astype(np.int16)
 near = lambda rgb, t: np.abs(A - rgb).sum(2) <= t
 ink2, grid, blk, blu = near([76, 75, 73], 30), near([216, 215, 210], 18), near([0, 0, 7], 60), near([57, 115, 185], 60)

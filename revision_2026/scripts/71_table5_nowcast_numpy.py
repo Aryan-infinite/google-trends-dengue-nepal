@@ -34,9 +34,10 @@ for sn, s in SER.items():
             K[f'{sn}_{sc}_mae_{M}'] = np.mean(np.abs(e)); K[f'{sn}_{sc}_rmse_{M}'] = np.sqrt(np.mean(e ** 2))
             K[f'{sn}_{sc}_maelog_{M}'] = np.mean(np.abs(np.log1p(p) - np.log1p(obs)))
             for y in sorted(set(yrs)): K[f'{sn}_{sc}_mae{y}_{M}'] = np.mean(np.abs(e[yrs == y]))
-            o, f = obs > 1000, p > 1000
-            K[f'{sn}_{sc}_sens1000_{M}'] = (o & f).sum() / o.sum() if o.sum() else np.nan
-            K[f'{sn}_{sc}_spec1000_{M}'] = (~o & ~f).sum() / (~o).sum()
+            for thr in (1000, 500):                                                    # 500: sensitivity threshold (added 2026-11-24)
+                o, f = obs > thr, p > thr
+                K[f'{sn}_{sc}_sens{thr}_{M}'] = (o & f).sum() / o.sum() if o.sum() else np.nan
+                K[f'{sn}_{sc}_spec{thr}_{M}'] = (~o & ~f).sum() / (~o).sum(); K[f'{sn}_{sc}_nepi{thr}'] = int(o.sum())
         a1, a2 = np.abs(np.array(P['M1']) - obs), np.abs(np.array(P['M2']) - obs)
         K[f'{sn}_{sc}_diff'] = np.mean(a2 - a1); K[f'{sn}_{sc}_better'] = sum(a2[yrs == y].mean() < a1[yrs == y].mean() for y in set(yrs))
         K[f'{sn}_{sc}_nseasons'] = len(set(yrs)); K[f'{sn}_{sc}_ntest'] = len(obs)

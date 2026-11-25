@@ -1,4 +1,4 @@
-// Third, independent implementation of Supplementary Figure S2 values (JavaScript). Reads the RAW EDCD district workbook
+// Third, independent implementation of Supplementary Figure S3 values (JavaScript). Reads the RAW EDCD district workbook
 // (all yearly sheets, via jszip + XML parsing), assigns each of the 77 districts to its pre-2015 development region from
 // its own district list, reads the regional Google Trends files, and computes per region (2020-2023): seasonally adjusted
 // correlation, effective sample size (lagged Pearson autocorrelations, lags 1-12, floor 4), Fisher 95% CI, zero months and
@@ -57,5 +57,5 @@ const adj = v => { const m = Array(12).fill(0); v.forEach((x, i) => m[i % 12] +=
     out.push([rg, r, ne, Math.tanh(z - 1.96 * se), Math.tanh(z + 1.96 * se), s.filter(v => v === 0).length, mx(c, 36, 48) / mx(c, 24, 36), mx(s, 36, 48) / mx(s, 24, 36)]
       .map(v => typeof v === 'number' ? v.toPrecision(17) : v).join(','));
   }
-  fs.writeFileSync('out/figS2_values_js.csv', out.join('\n') + '\n'); console.log(`${assigned / 4} districts per year assigned to exactly one region`); console.log(out.join('\n'));
+  fs.writeFileSync('out/figS3_values_js.csv', out.join('\n') + '\n'); console.log(`${assigned / 4} districts per year assigned to exactly one region`); console.log(out.join('\n'));
 })().catch(e => { console.error(e); process.exit(1); });

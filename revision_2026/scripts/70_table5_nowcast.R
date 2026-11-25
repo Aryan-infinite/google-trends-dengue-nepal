@@ -24,7 +24,8 @@ for (sn in names(SER)) { LX <- log(SER[[sn]] + 0.5)
     for (M in names(P)) { e <- P[[M]] - obs; key <- function(z) sprintf("%s_%s_%s_%s", sn, s, z, M)
       put(key("mae"), mean(abs(e))); put(key("rmse"), sqrt(mean(e^2))); put(key("maelog"), mean(abs(log1p(P[[M]]) - log1p(obs))))
       for (y in unique(yrs)) put(sprintf("%s_%s_mae%d_%s", sn, s, y, M), mean(abs(e[yrs == y])))
-      o <- obs > 1000; f <- P[[M]] > 1000; put(key("sens1000"), sum(o & f) / sum(o)); put(key("spec1000"), sum(!o & !f) / sum(!o)) }
+      for (thr in c(1000, 500)) { o <- obs > thr; f <- P[[M]] > thr                     # 500: sensitivity threshold (added 2026-11-24)
+        put(key(paste0("sens", thr)), sum(o & f) / sum(o)); put(key(paste0("spec", thr)), sum(!o & !f) / sum(!o)); put(sprintf("%s_%s_nepi%d", sn, s, thr), sum(o)) } }
     d <- abs(P$M2 - obs) - abs(P$M1 - obs); put(sprintf("%s_%s_diff", sn, s), mean(d))
     put(sprintf("%s_%s_better", sn, s), sum(sapply(unique(yrs), function(y) mean(abs(P$M2 - obs)[yrs == y]) < mean(abs(P$M1 - obs)[yrs == y]))))
     put(sprintf("%s_%s_nseasons", sn, s), length(unique(yrs))); put(sprintf("%s_%s_ntest", sn, s), length(obs))

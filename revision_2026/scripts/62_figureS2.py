@@ -1,9 +1,9 @@
-"""Supplementary Figure S3: timing of search interest, cases and official announcements within each year, 2019-2024.
+"""Supplementary Figure S2: timing of search interest, cases and official announcements within each year, 2019-2024.
 Each series is divided by its own annual maximum (cases 2019: June-December only; January-May 2019 not recorded).
 Events: governance/announcement_events.csv (one row per opened page) and the five dated 2024 counts in
 out/06_2024_reporting_lag.csv (the 31 December annual total is not an in-season announcement and is not drawn).
-Exports: out/figS3_values.csv (computed), out/figS3_plotted_values.csv (read back from the drawn artists),
-out/figS3_events_drawn.csv, out/figS3_text.csv."""
+Exports: out/figS2_values.csv (computed), out/figS2_plotted_values.csv (read back from the drawn artists),
+out/figS2_events_drawn.csv, out/figS2_text.csv."""
 import os, sys, calendar, csv
 sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np, pandas as pd, openpyxl
@@ -39,7 +39,7 @@ for i, y in enumerate(range(2019, 2025)):
     if y == 2019: c[:5] = np.nan
     for m in range(12):
         V.append(dict(year=y, month=m + 1, x=m + 0.5, cases=c[m], search=s[m], cases_rel=c[m] / np.nanmax(c), search_rel=s[m] / s.max()))
-V = pd.DataFrame(V); V.to_csv('out/figS3_values.csv', index=False, float_format='%.17g')
+V = pd.DataFrame(V); V.to_csv('out/figS2_values.csv', index=False, float_format='%.17g')
 
 SHAPE = {'alert': dict(marker='v', mfc=fc.INK2, mec=fc.INK2), 'count': dict(marker='o', mfc='white', mec=fc.INK2, mew=0.8),
          'report': dict(marker='s', mfc=fc.INK2, mec=fc.INK2)}
@@ -78,10 +78,10 @@ lg = fig.legend(handles=H, loc='upper center', ncol=3, frameon=False, bbox_to_an
 for t in lg.get_texts(): TXT.append(('legend', 0, t.get_text()))
 fig.subplots_adjust(left=0.085, right=0.985, top=0.885, bottom=0.075)
 
-pd.DataFrame(P).to_csv('out/figS3_plotted_values.csv', index=False, float_format='%.17g')
-pd.DataFrame(EVD).to_csv('out/figS3_events_drawn.csv', index=False, float_format='%.17g')
-pd.DataFrame(TXT, columns=['kind', 'year', 'text']).to_csv('out/figS3_text.csv', index=False)
+pd.DataFrame(P).to_csv('out/figS2_plotted_values.csv', index=False, float_format='%.17g')
+pd.DataFrame(EVD).to_csv('out/figS2_events_drawn.csv', index=False, float_format='%.17g')
+pd.DataFrame(TXT, columns=['kind', 'year', 'text']).to_csv('out/figS2_text.csv', index=False)
 os.makedirs('manuscript/figures', exist_ok=True)
-fc.save_tiff_cmyk(fig, 'manuscript/figures/FigS3.tif')
+fc.save_tiff_cmyk(fig, 'manuscript/figures/FigS2.tif')
 print(V.groupby('year').apply(lambda d: pd.Series(dict(search_max=d.search.max(), case_max=np.nanmax(d.cases))), include_groups=False))
 print(len(EVD), 'events drawn')

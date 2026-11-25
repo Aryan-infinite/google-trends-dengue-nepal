@@ -179,16 +179,16 @@ for s5, e5, y50, y51 in [t for t in order if t[2] == max(o[2] for o in order)]:
     check(f'FS1 x tick labels (panel at x {s5})', got == ['1', '5', '10', '15', '20'], got)
     got = ocr(img, (s5, yb5 + 250, s5 + 3800, yb5 + 520), psm=7)
     check(f'FS1 x axis title (panel at x {s5})', got == 'Lag (months)', got)
-# ---------------- Figure S2 ----------------
-if not os.path.exists('manuscript/figures/FigS2.tif'):                            # S2 needs the non-public EDCD district workbook
-    print('[SKIP] FS2: manuscript/figures/FigS2.tif not built (needs the EDCD district workbook, which is not public)')
+# ---------------- Figure S3 ----------------
+if not os.path.exists('manuscript/figures/FigS3.tif'):                            # S2 needs the non-public EDCD district workbook
+    print('[SKIP] FS3: manuscript/figures/FigS3.tif not built (needs the EDCD district workbook, which is not public)')
 else:
-    img, a = load('manuscript/figures/FigS2.tif'); sp = spines(a)[:2]                  # third full-height line = reference line
+    img, a = load('manuscript/figures/FigS3.tif'); sp = spines(a)[:2]                  # third full-height line = reference line
     for (s6, e6, y60, y61), lab, xl, xt in zip(sp, 'ab', ('Correlation, seasonally adjusted (95% CI)', '2023 peak ÷ 2022 peak (log scale)'),
                                                (['0', '0.25', '0.50', '0.75', '1.00'], ['0.1', '0.3', '1', '3', '10'])):
         yb6 = bottom_row(a, s6, y61)
         got = ocr(img, (s6 - 1100, y60, s6 - 40, yb6), psm=6).split()
-        check(f'FS2({lab}) row labels', got == ['Central', 'Eastern', 'Western'], got)
+        check(f'FS3({lab}) row labels', got == ['Central', 'Eastern', 'Western'], got)
         right = sp[1][0] - 800 if lab == 'a' else img.width - 5
         tx = ([s6 + 5] if lab == 'a' else []) + ticks_x(a, s6 + 12, right, yb6)
         def lone_zero(t):
@@ -198,17 +198,17 @@ else:
             return '0' if len(xx) and (xx.max() - xx.min() + 1) / (yy.max() - yy.min() + 1) < 0.8 else '?'
         got = [norm(ocr(img, (t - 230, yb6 + 60, t + 230, yb6 + 250), psm=7, whitelist='0123456789.')) for t in tx]
         got = [g if g not in ('', 'O') else lone_zero(t) for g, t in zip(got, tx)]
-        check(f'FS2({lab}) x tick labels', got == xt, got)
+        check(f'FS3({lab}) x tick labels', got == xt, got)
         got = ocr(img, (s6 - 500, yb6 + 250, right, yb6 + 520), psm=7).replace('(95% Cl)', '(95% CI)').replace(' peak + 2022', ' peak ÷ 2022')  # OCR: I/l and ÷/+ ambiguous; exact strings checked in scripts/58
-        check(f'FS2({lab}) x axis title (CI/Cl read as the same)', got == xl, got)
+        check(f'FS3({lab}) x axis title (CI/Cl read as the same)', got == xl, got)
         lx6 = int(s6 - 0.3 * (right - s6))                                              # panel letters sit at -0.3 axes widths
         got = ocr(img, (lx6 - 150, y60 - 330, lx6 + 520, y60 - 10), psm=7)
-        check(f'FS2({lab}) panel letter', got == f'({lab})', got)
+        check(f'FS3({lab}) panel letter', got == f'({lab})', got)
     got = ocr(img, (sp[1][0], 0, img.width, sp[1][2] - 30), psm=7)
-    check('FS2 legend', all(t in got for t in ('Cases', 'Search interest')), got)
-# ---------------- Figure S3 ----------------
-img, a = load('manuscript/figures/FigS3.tif'); order = sorted(spines(a), key=lambda t: (t[2], t[0]))       # 2019 2020 / 2021 2022 / 2023 2024
-check('FS3 six panels found', len(order) == 6, str(len(order)))
+    check('FS3 legend', all(t in got for t in ('Cases', 'Search interest')), got)
+# ---------------- Figure S2 ----------------
+img, a = load('manuscript/figures/FigS2.tif'); order = sorted(spines(a), key=lambda t: (t[2], t[0]))       # 2019 2020 / 2021 2022 / 2023 2024
+check('FS2 six panels found', len(order) == 6, str(len(order)))
 NOTE = {2019: 'Cases not recorded Jan-May', 2020: 'Search index < 3 all year', 2021: 'Search index < 2 all year'}   # OCR reads ≤ as <; exact bytes in scripts/63
 okt, okn, bad = 0, 0, []
 for k, (s7, e7, y70, y71) in enumerate(order):
@@ -217,8 +217,8 @@ for k, (s7, e7, y70, y71) in enumerate(order):
     blank = not (np.abs(a[y70 - 330:y70 - 10, s7 + 1500:lim] - 255).sum(2) > 60).any()     # tesseract invents text on blank crops
     n = '' if blank else norm(ocr(img, (s7 + 1500, y70 - 330, lim, y70 - 10), psm=7)).replace('≤', '<'); okn += n == NOTE.get(y, '')
     if t != f'({"abcdef"[k]}) {y}' or n != NOTE.get(y, ''): bad.append((t, n))
-check('FS3 six panel titles', okt == 6, f'{okt}/6' + (f'; {bad}' if bad else ''))
-check('FS3 notes on 2019-2021 only, text as intended', okn == 6, f'{okn}/6')
+check('FS2 six panel titles', okt == 6, f'{okt}/6' + (f'; {bad}' if bad else ''))
+check('FS2 notes on 2019-2021 only, text as intended', okn == 6, f'{okn}/6')
 oky = 0
 for s7, e7, y70, y71 in [t for t in order if t[0] < img.width // 2]:
     tys = ticks_y(a, s7, y70, y71)
@@ -228,20 +228,20 @@ for s7, e7, y70, y71 in [t for t in order if t[0] < img.width // 2]:
            ocr(img, (s7 - 520, t - 100, s7 - 70, t + 100), psm=7, whitelist='0123456789.').replace('05', '0.5') for i, t in enumerate(tys)]
     oky += got == ['1', '0.5', '0']
     got_t = ocr(img, (0, y70 - 200, s7 - 330, y71 + 200), psm=7, rotate=-90)
-    check(f'FS3 y axis title (panel row at y {y70})', got_t == 'Share of annual maximum', got_t)
-check('FS3 y tick labels on the three left panels', oky == 3, f'{oky}/3 exact')
+    check(f'FS2 y axis title (panel row at y {y70})', got_t == 'Share of annual maximum', got_t)
+check('FS2 y tick labels on the three left panels', oky == 3, f'{oky}/3 exact')
 for s7, e7, y70, y71 in order[-2:]:
     yb7 = bottom_row(a, s7, y71); tx = ticks_x(a, s7 + 12, s7 + 3800, yb7)
     got = [ocr(img, (t - 150, yb7 + 60, t + 150, yb7 + 260), psm=10, whitelist='JFMASOND') for t in tx]
-    check(f'FS3 month tick labels (panel at x {s7})', got == list('JFMAMJJASOND'), ''.join(got))
+    check(f'FS2 month tick labels (panel at x {s7})', got == list('JFMAMJJASOND'), ''.join(got))
     got = ocr(img, (s7, yb7 + 250, s7 + 3750, yb7 + 520), psm=7)
-    check(f'FS3 x axis title (panel at x {s7})', got == 'Month', got)
+    check(f'FS2 x axis title (panel at x {s7})', got == 'Month', got)
 s7, e7, y70, y71 = order[2]
 got = ocr(img, (s7 + 300, y70 + 40, s7 + 3600, y70 + 230), psm=7)
-check('FS3 2021 strip text', got == 'No national alert found', got)
+check('FS2 2021 strip text', got == 'No national alert found', got)
 top = a[:order[0][2] - 380]; r = np.where((np.abs(top - [255, 255, 255]).sum(2) > 60).any(1))[0]; br = np.where(np.diff(r) > 1)[0]
 got = ' | '.join(ocr(img, (0, u - 30, img.width, v + 30), psm=7) for u, v in zip(np.r_[r[0], r[br + 1]], np.r_[r[br], r[-1]]))
-check('FS3 legend (all five entries)', all(t in got for t in ('Cases', 'Search interest', 'National alert or EDCD statement', 'Count announced',
+check('FS2 legend (all five entries)', all(t in got for t in ('Cases', 'Search interest', 'National alert or EDCD statement', 'Count announced',
                                                             'Daily reports began / WHO report')), got)
 print(f'RESULT: {len(fails)} failed check(s)')
 sys.exit(1 if fails else 0)
